@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@layer components {
+  .dead::before {
+    @apply content-['💀'] absolute flex justify-center items-center h-full w-full text-xl top-0 left-0 bg-[rgba(0,0,0,0.7)]
+  }
+}
+
+body{
+  overflow-x: hidden !important;
+}
+
+canvas{
+  position: fixed !important;
+}
