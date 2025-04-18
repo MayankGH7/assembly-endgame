@@ -46,7 +46,6 @@ function App() {
             message: currentWord
           }
         });
-        console.log(data)
         if(error || !data){
           throw error;
         }
