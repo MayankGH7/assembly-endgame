@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {clsx} from "clsx"
 import ReactConfetti from "react-confetti";
 import { FallingEmojis } from 'falling-emojis';
-
+import { supabase } from "./util/supabaseClient";
 import {getFarewellText, getRandomWord, languages} from "./util/util"
 
 
@@ -11,6 +11,7 @@ function App() {
   const [currentWord, setCurrentWord] = useState((): string => getRandomWord());
   const [lettersGuessed, setLettersGuessed] = useState<string[]>([]);
   const newGameBtn = useRef<HTMLButtonElement>(null);
+  const hintPara = useRef<HTMLSpanElement>(null);
 
   const alphabets = "abcdefghijklmnopqrstuvwxyz";
 
@@ -35,6 +36,29 @@ function App() {
     const btn = newGameBtn.current;
     if(btn) btn.scrollIntoView({behavior: "smooth"});
   }, [isGameOver]);
+
+  useEffect(() => {
+    hintPara.current!.textContent = "Loading...";
+    async function fetchRecipe(){
+      try {
+        const {data, error} = await supabase.functions.invoke<{response: string}>("get_hint", {
+          body: {
+            message: currentWord
+          }
+        });
+        console.log(data)
+        if(error || !data){
+          throw error;
+        }
+        hintPara.current!.textContent = data.response;
+      }catch(err){
+        console.error(err);
+        hintPara.current!.style.color = "red";
+        hintPara.current!.textContent = "Error fetching hint";
+      }
+    };
+    fetchRecipe();
+  }, [currentWord]);
 
   function setGuessedLetter(letter: string){
     setLettersGuessed(prev => prev.includes(letter) ? prev : [...prev, letter])
@@ -103,6 +127,10 @@ function App() {
           You have {languages.length - 1} attempts left.
         </p>
         <p>{currentWord.split("").map(letter => lettersGuessed.includes(letter)? letter + " "  : "blank").join(" ")}</p>
+      </section>
+
+      <section className="my-7">
+      <p><b>Hint: </b><span ref={hintPara}></span></p>
       </section>
 
       <section className="max-w-2xl flex flex-wrap justify-center gap-2">

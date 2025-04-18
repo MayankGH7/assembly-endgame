@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
     "falling-emojis": "^1.0.10",
     "react": "^19.0.0",
     "react-confetti": "^6.4.0",
